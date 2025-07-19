@@ -1,54 +1,54 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import { Card } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Checkbox } from '@/components/ui/checkbox'
-import { Trash2 } from 'lucide-react'
-import { Todo } from '@/lib/types'
+import { Trash2 } from "lucide-react";
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Input } from "@/components/ui/input";
+import type { Todo } from "@/lib/types";
 
 export default function Home() {
-	const [todos, setTodos] = useState<Todo[]>([])
-	const [inputValue, setInputValue] = useState('')
+	const [todos, setTodos] = useState<Todo[]>([]);
+	const [inputValue, setInputValue] = useState("");
 
 	const addTodo = () => {
-		if (inputValue.trim() !== '') {
+		if (inputValue.trim() !== "") {
 			const newTodo: Todo = {
 				id: crypto.randomUUID(),
 				title: inputValue.trim(),
 				completed: false,
-				createdAt: new Date()
-			}
-			setTodos([...todos, newTodo])
-			setInputValue('')
+				createdAt: new Date(),
+			};
+			setTodos([...todos, newTodo]);
+			setInputValue("");
 		}
-	}
+	};
 
 	const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-		if (e.key === 'Enter') {
-			e.preventDefault()
-			addTodo()
+		if (e.key === "Enter") {
+			e.preventDefault();
+			addTodo();
 		}
-	}
+	};
 
 	const toggleTodo = (id: string) => {
-		setTodos(todos.map(todo => 
-			todo.id === id 
-				? { ...todo, completed: !todo.completed }
-				: todo
-		))
-	}
+		setTodos(
+			todos.map((todo) =>
+				todo.id === id ? { ...todo, completed: !todo.completed } : todo,
+			),
+		);
+	};
 
 	const deleteTodo = (id: string) => {
-		setTodos(todos.filter(todo => todo.id !== id))
-	}
+		setTodos(todos.filter((todo) => todo.id !== id));
+	};
 
 	return (
 		<div className="min-h-screen bg-background p-4">
 			<div className="max-w-md mx-auto">
 				<h1 className="text-2xl font-bold mb-6 text-center">TODOアプリ</h1>
-				
+
 				<Card className="p-4 mb-6">
 					<div className="flex gap-2">
 						<Input
@@ -69,7 +69,9 @@ export default function Home() {
 									checked={todo.completed}
 									onCheckedChange={() => toggleTodo(todo.id)}
 								/>
-								<span className={`flex-1 ${todo.completed ? 'line-through text-muted-foreground' : ''}`}>
+								<span
+									className={`flex-1 ${todo.completed ? "line-through text-muted-foreground" : ""}`}
+								>
 									{todo.title}
 								</span>
 								<Button
@@ -92,5 +94,5 @@ export default function Home() {
 				)}
 			</div>
 		</div>
-	)
+	);
 }
