@@ -6,13 +6,16 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
 import { Play, Pause, RotateCcw } from "lucide-react";
-import { useState } from "react";
+import { formatTime } from "@/lib/utils";
+import { usePomodoro } from "@/hooks/usePomodoro";
 
 export default function Pomodoro() {
   const progress = 0; // 0-100
   const sessionCount = 0;
-  const isRunning = false;
-  const [timeRemaining, setTimeRemaining] = useState<number>('25:00');
+
+  const { isRunning, remainingTime, toggleTimer, resetTimer } = usePomodoro()
+
+
 
   return (
     <main className="min-h-screen bg-background flex items-center justify-center p-4">
@@ -28,7 +31,7 @@ export default function Pomodoro() {
           {/* タイマー表示 */}
           <div className="text-center">
             <div className="text-6xl font-mono font-bold mb-4">
-              {timeRemaining}
+              {formatTime(remainingTime)}
             </div>
             <Progress value={progress} className="w-full h-2" />
           </div>
@@ -41,6 +44,7 @@ export default function Pomodoro() {
               size="lg"
               variant={isRunning ? "secondary" : "default"}
               className="flex items-center gap-2"
+              onClick={toggleTimer}
             >
               {isRunning ? (
                 <>
@@ -55,7 +59,7 @@ export default function Pomodoro() {
               )}
             </Button>
             
-            <Button size="lg" variant="outline" className="flex items-center gap-2">
+            <Button size="lg" variant="outline" className="flex items-center gap-2" onClick={resetTimer}>
               <RotateCcw className="h-4 w-4" />
               リセット
             </Button>
