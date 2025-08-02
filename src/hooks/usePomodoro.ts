@@ -1,23 +1,75 @@
 import { useEffect, useState } from "react";
+import { POMODORO_SESSIONS_UNTIL_LONG_BREAK, POMODORO_WORK_TIME, POMODORO_LONG_BREAK, POMODORO_SHORT_BREAK } from "@/lib/constants";
+import { TimeMode } from "@/lib/types";
+
+export function usePomodoro() {
+	const [isRunning, setIsRunning] = useState(false);
+	const [remainingTime, setRemainingTime] =
+		useState<number>(POMODORO_WORK_TIME);
+	const [sessionCount, setSessionCount] = useState<number>(0);
+  const [mode, setMode] = useState<TimeMode>('work')
+
+	const toggleTimer = () => setIsRunning((prev) => !prev);
+
+	const resetTimer = () => {
+		setRemainingTime(POMODORO_WORK_TIME);
+		setIsRunning(false);
+    setMode('work');
+	};
 
 
-export function usePomodoro () {
-  const [isRunning, setIsRunning] = useState<boolean>(false);
-  const [remainingTime, setRemainingTime] = useState<number>(25 * 60);
+	// タイマー処理のuseEffect
+	useEffect(() => {
+		if (!isRunning) return;
 
-  const toggleTimer = () => setIsRunning((prev) => !prev);
-  const resetTimer = () => setRemainingTime(25 * 60);
+		const intervalId = setInterval(() => {
+			setRemainingTime((prev) => (prev > 0 ? prev - 1 : 0));
+		}, 1000);
 
-  useEffect(() => {
-    if (isRunning === false) return undefined;
-    const intervalId = setInterval(() => {
-      setRemainingTime((prev) => prev > 0 ? prev - 1 : 0);
-    }, 1000);
+		return () => clearInterval(intervalId);
+	}, [isRunning]);
 
-    return () => {
-      clearInterval(intervalId);
+	// 完了判定のuseEffect
+	useEffect(() => {
+		if (remainingTime === 0 && isRunning) {
+      if (mode === 'work') {
+        setSessionCount((prev) => Math.min(prev + 1, POMODORO_SESSIONS_UNTIL_LONG_BREAK));
+        setMode('break');
+
+        const breakTime = sessionCount + 1 >= POMODORO_SESSIONS_UNTIL_LONG_BREAK
+          ? POMODORO_LONG_BREAK
+          : POMODORO_SHORT_BREAK
+        setRemainingTime(breakTime);
+      } else {
+        setMode('work');
+        setRemainingTime(POMODORO_WORK_TIME);
+
+        if (sessionCount >= POMODORO_SESSIONS_UNTIL_LONG_BREAK) {
+          setSessionCount(0);
+      }
     }
-  },[isRunning])
+      // setIsRunning(false);
+		}
+	}, [isRunning, remainingTime, mode, sessionCount]);
 
-  return { isRunning, remainingTime, toggleTimer, resetTimer };
+	const progress =
+		((getInitialTime() - remainingTime) / getInitialTime()) * 100;
+
+  function getInitialTime() {
+    if (mode === 'work') return POMODORO_WORK_TIME;
+    return sessionCount >= POMODORO_SESSIONS_UNTIL_LONG_BREAK
+      ? POMODORO_LONG_BREAK
+      : POMODORO_SHORT_BREAK;
+  }
+
+	return {
+		sessionCount,
+		isRunning,
+		remainingTime,
+		progress,
+		toggleTimer,
+		resetTimer,
+    mode,
+
+	};
 }

@@ -10,11 +10,7 @@ import { formatTime } from "@/lib/utils";
 import { usePomodoro } from "@/hooks/usePomodoro";
 
 export default function Pomodoro() {
-  const progress = 0; // 0-100
-  const sessionCount = 0;
-
-  const { isRunning, remainingTime, toggleTimer, resetTimer } = usePomodoro()
-
+  const { sessionCount,isRunning, remainingTime, progress, toggleTimer, resetTimer, mode } = usePomodoro()
 
 
   return (
@@ -23,7 +19,7 @@ export default function Pomodoro() {
         <CardHeader className="text-center">
           <CardTitle className="text-3xl font-bold">ポモドーロタイマー</CardTitle>
           <Badge variant="secondary" className="mx-auto mt-2">
-            作業時間
+            {mode === 'work' ? '作業時間' : '休憩時間' }
           </Badge>
         </CardHeader>
         
