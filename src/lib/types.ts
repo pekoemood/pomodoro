@@ -7,5 +7,4 @@ export interface Todo {
 
 export type TodoFilter = "all" | "active" | "completed";
 
-export type TimeMode = 'work' | 'break'
-
+export type TimeMode = "work" | "break";
